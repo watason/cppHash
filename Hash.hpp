@@ -17,11 +17,12 @@ namespace sha
     class Hash<sha256>
     {
     public:
+        using Type = unsigned int;
         std::string seed;
         std::vector<uint8_t> messages;
         size_t N;
         static constexpr size_t BLOCK_SIZE = 64;
-        static constexpr std::array<unsigned int, 64> K = {
+        static constexpr std::array<Type, 64> K = {
             0x428a2f98UL, 0x71374491UL, 0xb5c0fbcfUL, 0xe9b5dba5UL,
             0x3956c25bUL, 0x59f111f1UL, 0x923f82a4UL, 0xab1c5ed5UL,
             0xd807aa98UL, 0x12835b01UL, 0x243185beUL, 0x550c7dc3UL,
@@ -38,39 +39,39 @@ namespace sha
             0x391c0cb3UL, 0x4ed8aa4aUL, 0x5b9cca4fUL, 0x682e6ff3UL,
             0x748f82eeUL, 0x78a5636fUL, 0x84c87814UL, 0x8cc70208UL,
             0x90befffaUL, 0xa4506cebUL, 0xbef9a3f7UL, 0xc67178f2UL};
-        std::array<unsigned int, 8> H = {0x6a09e667, 0xbb67ae85, 0x3c6ef372,
+        std::array<Type, 8> H = {0x6a09e667, 0xbb67ae85, 0x3c6ef372,
                                          0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
     public:
-        unsigned int Rot(unsigned int v, int n)
+        Type Rot(Type v, int n)
         {
             return (v << n) | (v >> (32 - n));
         }
-        unsigned int Shr(unsigned int v, int n)
+        Type Shr(Type v, int n)
         {
             return (v >> n);
         }
-        unsigned int Sigma0(unsigned int x)
+        Type Sigma0(Type x)
         {
             return Rot(x, 30) ^ Rot(x, 19) ^ Rot(x, 10);
         }
-        unsigned int Sigma1(unsigned int x)
+        Type Sigma1(Type x)
         {
             return Rot(x, 26) ^ Rot(x, 21) ^ Rot(x, 7);
         }
-        unsigned int sigma0(unsigned int x)
+        Type sigma0(Type x)
         {
             return Rot(x, 25) ^ Rot(x, 14) ^ Shr(x, 3);
         }
-        unsigned int sigma1(unsigned int x)
+        Type sigma1(Type x)
         {
             return Rot(x, 15) ^ Rot(x, 13) ^ Shr(x, 10);
         }
-        unsigned int Ch(unsigned int x, unsigned int y, unsigned int z)
+        Type Ch(Type x, Type y, Type z)
         {
             return (x & y) ^ (~x & z);
         }
-        unsigned int Maj(unsigned int x, unsigned int y, unsigned int z)
+        Type Maj(Type x, Type y, Type z)
         {
             return (x & y) ^ (y & z) ^ (x & z);
         }
@@ -85,19 +86,19 @@ namespace sha
             }
             ret[size] = 0x80;
             size *= 8;
-            ret[padding_size - 4] = static_cast<unsigned int>(size >> 24) & 0xff;
-            ret[padding_size - 3] = static_cast<unsigned int>(size >> 16) & 0xff;
-            ret[padding_size - 2] = static_cast<unsigned int>(size >> 8) & 0xff;
-            ret[padding_size - 1] = static_cast<unsigned int>(size) & 0xff;
+            ret[padding_size - 4] = static_cast<Type>(size >> 24) & 0xff;
+            ret[padding_size - 3] = static_cast<Type>(size >> 16) & 0xff;
+            ret[padding_size - 2] = static_cast<Type>(size >> 8) & 0xff;
+            ret[padding_size - 1] = static_cast<Type>(size) & 0xff;
             return ret;
         }
-        unsigned int loadMessge(const std::vector<uint8_t> &arr, int index)
+        Type loadMessge(const std::vector<uint8_t> &arr, int index)
         {
-            unsigned int load{};
-            load |= static_cast<unsigned int>(arr[index]) << 24;
-            load |= static_cast<unsigned int>(arr[index + 1]) << 16;
-            load |= static_cast<unsigned int>(arr[index + 2]) << 8;
-            load |= static_cast<unsigned int>(arr[index + 3]);
+            Type load{};
+            load |= static_cast<Type>(arr[index]) << 24;
+            load |= static_cast<Type>(arr[index + 1]) << 16;
+            load |= static_cast<Type>(arr[index + 2]) << 8;
+            load |= static_cast<Type>(arr[index + 3]);
             return load;
         }
         Hash(const std::string &str) : seed(str), messages(padding(str)) {}
@@ -106,9 +107,9 @@ namespace sha
             size_t size = messages.size();
             for (int num = 0; num < size; num += 64)
             {
-                unsigned int T1{}, T2{}, s0{}, s1{};
-                std::array<unsigned int, 16> X;
-                std::array<unsigned int, 8> arr;
+                Type T1{}, T2{}, s0{}, s1{};
+                std::array<Type, 16> X;
+                std::array<Type, 8> arr;
                 for (int i = 0; i < 8; ++i)
                 {
                     arr[i] = H[i];
